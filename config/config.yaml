@@ -1,0 +1,6 @@
+artifacts_root: artifacts
+
+data_ingestion:
+  root_dir: artifacts/data_ingestion
+  source_URL: https://drive.usercontent.google.com/download?id=184K8sLVcL_fq76pA2o8Bg4BthNLcwUel&export=download&authuser=0&confirm=t
+  local_data_file: artifacts/data_ingestion/labels_and_dataset.zip

@@ -1,0 +1,17 @@
+# --index-url https://download.pytorch.org/whl/cu121
+# torch
+# torchvision
+# torchaudio 
+notebook==7.0.0a7
+scikit-learn
+numpy
+opencv-python
+matplotlib
+python-box==6.0.2
+pyYAML
+tqdm
+joblib
+types-PyYAML
+ensure==1.0.2
+
+-e .
