@@ -6,7 +6,7 @@ class DataValidation:
     def __init__(self, config: DataValidationConfig):
         self.config = config
     
-    def validate_all_columns(self)-> bool:
+    def validate_dataset(self)-> bool:
         try:
             validation_status = None
 
@@ -23,15 +23,18 @@ class DataValidation:
                 
                 elif validation_status == None:
                     validation_status = True
-            
-            if len(data_df) == len(os.listdir(self.config.dataset_folder)):
-                with open(self.config.STATUS_FILE, 'w') as f:
-                    f.write(f"Validation status: {validation_status}")
-            else:
-                validation_status = False
-                with open(self.config.STATUS_FILE, 'w') as f:
-                    f.write(f"Validation status: {validation_status}")
+
+            for img in os.listdir(self.config.dataset_folder):
+                if img not in list(data_df[all_cols[0]]):
+                    validation_status = False
+                    with open(self.config.STATUS_FILE, 'w') as f:
+                        f.write(f"Validation status: {validation_status}")
                 
+                    return validation_status
+                
+            with open(self.config.STATUS_FILE, 'w') as f:
+                f.write(f"Validation status: {validation_status}")
+                        
             return validation_status
         
         except Exception as e:
