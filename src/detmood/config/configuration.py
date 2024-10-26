@@ -1,8 +1,12 @@
 from src.detmood.constant import *
-from src.detmood.entity.config_entity import DataIngestionConfig, DataValidationConfig
+from src.detmood.entity.config_entity import (
+    DataIngestionConfig,
+    DataValidationConfig,
+    DataTransformationConfig
+)
 from src.detmood.utils.main_utils import create_directories, read_yaml
 
-class ConfigurationMananger:
+class ConfigurationManager:
     def __init__(
         self,
         config_file_path = CONFIG_FILE_PATH,
@@ -43,3 +47,20 @@ class ConfigurationMananger:
         )
         
         return data_validation_config
+    
+    def get_data_transformation_config(self) -> DataTransformationConfig:
+        config = self.config.data_transformation
+        params = self.params.transform.noise_reduction
+        
+        create_directories([config.transformed_dataset])
+        
+        data_transformation_config = DataTransformationConfig(
+            root_dir=config.root_dir,
+            dataset_folder=config.dataset_folder,
+            transformed_dataset=config.transformed_dataset,
+            dataset_labels_src=config.dataset_labels_src,
+            dataset_labels=config.dataset_labels,
+            median_filter_size=params.median_filter_size
+        )
+        
+        return data_transformation_config

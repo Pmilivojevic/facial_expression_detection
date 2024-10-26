@@ -16,4 +16,13 @@ class DataValidationConfig:
     dataset_labels: Path
     STATUS_FILE: Path
     all_schema: list
-    
+
+
+@dataclass(frozen=True)
+class DataTransformationConfig:
+    root_dir: Path
+    dataset_folder: Path
+    transformed_dataset: Path
+    dataset_labels_src: Path
+    dataset_labels: Path
+    median_filter_size: int

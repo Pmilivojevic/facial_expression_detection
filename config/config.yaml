@@ -10,3 +10,10 @@ data_validation:
   dataset_folder: artifacts/data_ingestion/dataset
   dataset_labels: artifacts/data_ingestion/labels.csv
   STATUS_FILE: artifacts/data_validation/status.txt
+
+data_transformation:
+  root_dir: artifacts/data_transformation
+  dataset_folder: artifacts/data_ingestion/dataset
+  transformed_dataset: artifacts/data_transformation/dataset
+  dataset_labels_src: artifacts/data_ingestion/labels.csv
+  dataset_labels: artifacts/data_transformation/labels.csv

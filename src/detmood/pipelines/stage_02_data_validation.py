@@ -1,4 +1,4 @@
-from src.detmood.config.configuration import ConfigurationMananger
+from src.detmood.config.configuration import ConfigurationManager
 from src.detmood.components.data_validation import DataValidation
 
 class DataValidationTrainingPipeline:
@@ -6,7 +6,7 @@ class DataValidationTrainingPipeline:
         pass
     
     def main(self):
-        config = ConfigurationMananger()
+        config = ConfigurationManager()
         data_validation_config = config.get_data_validation_config()
         data_validation = DataValidation(config=data_validation_config)
         data_validation.validate_dataset()

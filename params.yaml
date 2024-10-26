@@ -1,1 +1,3 @@
-params: params
+transform:
+  noise_reduction:
+    median_filter_size: 3
