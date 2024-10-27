@@ -150,9 +150,24 @@ class ModelTrainer:
                 if avg_val_loss < best_val_loss:
                     best_val_loss = avg_val_loss
             
-            model_path = os.path.join(self.config.models, f'efficientnet_fold_{fold + 1}.pth')
-            torch.save(model.state_dict(), model_path)
-            print(f'Saved Best Model for Fold {fold + 1} at Epoch {epoch + 1}')
+                    model_path = os.path.join(self.config.models, f'efficientnet_fold_{fold + 1}.pth')
+                    torch.save(model.state_dict(), model_path)
+                    print(f'Saved Best Model for Fold {fold + 1} at Epoch {epoch + 1}')
+                    
+                    cm = confusion_matrix(all_labels, all_preds)
+                    plt.figure(figsize=(10, 8))
+                    sns.heatmap(
+                        cm,
+                        annot=True,
+                        fmt='d',
+                        cmap='Blues',
+                        xticklabels=range(self.config.model_params.num_classes),
+                        yticklabels=range(self.config.model_params.num_classes)
+                    )
+                    plt.xlabel('Predicted Labels')
+                    plt.ylabel('True Labels')
+                    plt.title(f'Confusion Matrix for Fold {fold + 1}')
+                    plt.savefig(os.path.join(self.config.figures, f'cm_fold_{fold + 1}.png'))
             
             epochs_range = range(1, self.config.model_params.num_epochs + 1)
             
@@ -173,21 +188,6 @@ class ModelTrainer:
             plt.title(f'Train/Validation Accuracy for Fold {fold + 1}')
             plt.legend()
             plt.savefig(os.path.join(self.config.figures, f'train_val_accuracy_fold_{fold + 1}.png'))
-            
-            cm = confusion_matrix(all_labels, all_preds)
-            plt.figure(figsize=(10, 8))
-            sns.heatmap(
-                cm,
-                annot=True,
-                fmt='d',
-                cmap='Blues',
-                xticklabels=range(self.config.model_params.num_classes),
-                yticklabels=range(self.config.model_params.num_classes)
-            )
-            plt.xlabel('Predicted Labels')
-            plt.ylabel('True Labels')
-            plt.title(f'Confusion Matrix for Fold {fold + 1}')
-            plt.savefig(os.path.join(self.config.figures, f'cm_fold_{fold + 1}.png'))
             
             print(f'Finished fold {fold + 1}/{self.config.model_params.num_folds}\n')
         

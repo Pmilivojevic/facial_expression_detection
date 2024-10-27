@@ -25,7 +25,7 @@ class DataTransformation:
         labels_df = pd.read_csv(self.config.dataset_labels_src)
         
         for ind in labels_df.index:
-            labels_df[ind, 'label'] = MOOD_DICT[labels_df[ind, 'label']]
+            labels_df.loc[ind, 'label'] = MOOD_DICT[labels_df.loc[ind, 'label']]
         
         labels_df.to_csv(self.config.dataset_labels, index=False)
     
