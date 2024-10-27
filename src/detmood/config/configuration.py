@@ -2,7 +2,8 @@ from src.detmood.constant import *
 from src.detmood.entity.config_entity import (
     DataIngestionConfig,
     DataValidationConfig,
-    DataTransformationConfig
+    DataTransformationConfig,
+    ModelTrainerConfig
 )
 from src.detmood.utils.main_utils import create_directories, read_yaml
 
@@ -64,3 +65,20 @@ class ConfigurationManager:
         )
         
         return data_transformation_config
+    
+    def get_model_trainer_config(self) -> ModelTrainerConfig:
+        config = self.config.model_trainer
+        params = self.params.model
+        
+        create_directories([config.models, config.figures])
+        
+        model_trainer_config = ModelTrainerConfig(
+            root_dir=config.root_dir,
+            models=config.models,
+            figures=config.figures,
+            dataset_folder=config.dataset_folder,
+            dataset_labels=config.dataset_labels,
+            model_params=params
+        )
+        
+        return model_trainer_config

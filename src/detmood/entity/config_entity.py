@@ -26,3 +26,13 @@ class DataTransformationConfig:
     dataset_labels_src: Path
     dataset_labels: Path
     median_filter_size: int
+
+
+@dataclass(frozen=True)
+class ModelTrainerConfig:
+    root_dir: Path
+    models: Path
+    figures: Path
+    dataset_folder: Path
+    dataset_labels: Path
+    model_params: dict

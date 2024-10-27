@@ -17,3 +17,10 @@ data_transformation:
   transformed_dataset: artifacts/data_transformation/dataset
   dataset_labels_src: artifacts/data_ingestion/labels.csv
   dataset_labels: artifacts/data_transformation/labels.csv
+
+model_trainer:
+  root_dir: artifacts/model_trainer
+  models: artifacts/model_trainer/models
+  figures: artifacts/model_trainer/figures
+  dataset_folder: artifacts/data_transformation/dataset
+  dataset_labels: artifacts/data_transformation/labels.csv

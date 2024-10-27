@@ -1,3 +1,11 @@
 transform:
   noise_reduction:
     median_filter_size: 3
+
+model:
+  num_folds: 5
+  batch_size: 32
+  num_epochs: 10
+  img_in_size: 224
+  lr: 0.001
+  num_classes: 7
