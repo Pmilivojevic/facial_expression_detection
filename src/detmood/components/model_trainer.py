@@ -16,10 +16,58 @@ import seaborn as sns
 from tqdm import tqdm
 
 class ModelTrainer:
+    """
+    A class for training a deep learning model using cross-validation and 
+    logging training progress, validation metrics, and model performance.
+
+    Attributes:
+    ----------
+    config : ModelTrainerConfig
+        Configuration object containing model training parameters, such as 
+        dataset paths, number of epochs, batch size, learning rate, and more.
+    """
+    
     def __init__(self, config: ModelTrainerConfig):
+        """
+        Initializes the ModelTrainer class with the given configuration.
+
+        Parameters:
+        ----------
+        config : ModelTrainerConfig
+            The configuration object containing training parameters, including 
+            paths for datasets, model saving locations, and training settings.
+        """
+        
         self.config = config
     
     def train(self):
+        """
+        Trains a deep learning model using cross-validation and logs the 
+        results.
+
+        The method performs the following steps:
+        1. Configures the device (GPU or CPU) for training.
+        2. Applies data transformations for image preprocessing.
+        3. Sets up the dataset and uses stratified k-fold cross-validation for 
+           training and validation splits.
+        4. Initializes the model, loss function, and optimizer.
+        5. Trains the model for each fold, logging loss and accuracy, and 
+           saves the best-performing model based on validation loss.
+        6. Plots and saves confusion matrices, training/validation loss, and 
+           accuracy graphs for each fold.
+
+        Side Effects:
+        -------------
+        - Saves trained models and training statistics to specified directories.
+        - Generates and saves plots for loss, accuracy, and confusion matrices.
+        - Logs training progress to the console.
+
+        Raises:
+        ------
+        Exception
+            If an error occurs during training, it will be raised.
+        """
+        
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         print('Device: ', device)
         

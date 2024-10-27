@@ -3,10 +3,48 @@ import pandas as pd
 from src.detmood.entity.config_entity import DataValidationConfig
 
 class DataValidation:
+    """
+    A class for performing data validation on a dataset to ensure it meets 
+    specific schema and consistency requirements.
+
+    Attributes:
+    ----------
+    config : DataValidationConfig
+        Configuration object containing settings for data validation, such as 
+        schema, dataset folder path, and status file path.
+    """
+    
     def __init__(self, config: DataValidationConfig):
+        """
+        Initializes the DataTransformation class with the given configuration.
+
+        Parameters:
+        ----------
+        config : DataTransformationConfig
+            The configuration object containing transformation parameters, such as 
+            filter size, dataset folder path, and labels file paths.
+        """
+        
         self.config = config
     
     def validate_dataset(self)-> bool:
+        """
+        Applies histogram equalization to an image to enhance its contrast.
+
+        The method converts the image from BGR to HSV, equalizes the histogram 
+        of the V channel, and then converts it back to BGR.
+
+        Parameters:
+        ----------
+        img : numpy.ndarray
+            The input image in BGR format.
+
+        Returns:
+        -------
+        numpy.ndarray
+            The histogram-equalized image in BGR format.
+        """
+        
         try:
             validation_status = None
 

@@ -46,3 +46,5 @@ Running process will create folder structure:
         - model_validation
 
 Project execution consists of five stages, five pipelines for downloading the data, validating the data, transforming the data, training the model, and validating the model. Results of every pipeline execution are put in a corresponding folder. The model validation part is missing. Because of the  limited time, I didn't get to implement that phase.
+
+In folder "figures" are images of train/validation plots for losses and accuracy, as well as the confusion matrixes for every fold of training with hyperparameters that you can find in "params.yaml" file.
