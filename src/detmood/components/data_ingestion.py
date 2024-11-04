@@ -73,3 +73,10 @@ class DataIngestion:
         
         os.remove(self.config.local_data_file)
         logger.info("Zip file removed!")
+    
+    def ingestion_compose(self):
+        if not os.listdir(self.config.root_dir):
+            self.download_dataset()
+            self.extract_zip_file()
+        else:
+            print("Data ingestion allready performed!")

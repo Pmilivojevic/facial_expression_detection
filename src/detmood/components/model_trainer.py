@@ -8,9 +8,11 @@ from torchvision.models import EfficientNet_B0_Weights
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix
 import os
+import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
+import gc
 
 class ModelTrainer:
     """
@@ -188,6 +190,8 @@ class ModelTrainer:
             None
         """
         
+        gc.collect()
+        torch.cuda.empty_cache()
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         print('Device: ', device)
         
@@ -255,6 +259,9 @@ class ModelTrainer:
                     _, predicted = torch.max(outputs.data, 1)
                     total_train += labels.size(0)
                     correct_train += (predicted == labels).sum().item()
+                    accuracy = 100*((predicted == labels).sum().item()/labels.size(0))
+                    sys.stdout.write("train_loss:%.4f - train_accuracy:%.4f" %(loss.item(), accuracy))
+                    sys.stdout.flush()
                     
                 avg_train_loss = running_loss / len(train_loader)
                 train_losses.append(avg_train_loss)

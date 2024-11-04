@@ -104,11 +104,14 @@ class DataTransformation:
         - tqdm : For displaying a progress bar during the transformation process.
         """
         
-        for img_name in tqdm(os.listdir(self.config.dataset_folder)):
-            img = cv2.imread(os.path.join(self.config.dataset_folder, img_name))
-            img_eq = self.equalize_histogram(img)
-            img_filt = self.noise_reduction(img_eq)
+        if not os.listdir(self.config.dataset_folder):
+            for img_name in tqdm(os.listdir(self.config.dataset_folder)):
+                img = cv2.imread(os.path.join(self.config.dataset_folder, img_name))
+                img_eq = self.equalize_histogram(img)
+                img_filt = self.noise_reduction(img_eq)
+                
+                cv2.imwrite(os.path.join(self.config.transformed_dataset, img_name), img_filt)
             
-            cv2.imwrite(os.path.join(self.config.transformed_dataset, img_name), img_filt)
-        
-        self.labels_csv_transform()
+            self.labels_csv_transform()
+        else:
+            print("Data transformation already performed!")
