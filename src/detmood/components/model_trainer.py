@@ -7,69 +7,41 @@ from torchvision import transforms, models
 from torchvision.models import EfficientNet_B0_Weights
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix
-import numpy as np
-import pandas as pd
 import os
-import cv2
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
 
 class ModelTrainer:
     """
-    A class for training a deep learning model using cross-validation and 
-    logging training progress, validation metrics, and model performance.
+    A class to handle model training with k-fold cross-validation.
+
+    This class is responsible for preparing dataset folds, training the model with each fold, 
+    validating the model, saving the best model checkpoint, and plotting metrics over epochs.
 
     Attributes:
-    ----------
-    config : ModelTrainerConfig
-        Configuration object containing model training parameters, such as 
-        dataset paths, number of epochs, batch size, learning rate, and more.
+        config (ModelTrainerConfig): Configuration object with training parameters and paths.
     """
     
     def __init__(self, config: ModelTrainerConfig):
         """
-        Initializes the ModelTrainer class with the given configuration.
+        Initializes the ModelTrainer with the given configuration.
 
-        Parameters:
-        ----------
-        config : ModelTrainerConfig
-            The configuration object containing training parameters, including 
-            paths for datasets, model saving locations, and training settings.
+        Args:
+            config (ModelTrainerConfig): Configuration object with paths and model parameters.
         """
         
         self.config = config
     
-    def train(self):
+    def dataset_folds_preparation(self):
         """
-        Trains a deep learning model using cross-validation and logs the 
-        results.
+        Prepares the dataset and stratified k-folds for cross-validation.
 
-        The method performs the following steps:
-        1. Configures the device (GPU or CPU) for training.
-        2. Applies data transformations for image preprocessing.
-        3. Sets up the dataset and uses stratified k-fold cross-validation for 
-           training and validation splits.
-        4. Initializes the model, loss function, and optimizer.
-        5. Trains the model for each fold, logging loss and accuracy, and 
-           saves the best-performing model based on validation loss.
-        6. Plots and saves confusion matrices, training/validation loss, and 
-           accuracy graphs for each fold.
+        Applies image transformations and initializes a StratifiedKFold splitter.
 
-        Side Effects:
-        -------------
-        - Saves trained models and training statistics to specified directories.
-        - Generates and saves plots for loss, accuracy, and confusion matrices.
-        - Logs training progress to the console.
-
-        Raises:
-        ------
-        Exception
-            If an error occurs during training, it will be raised.
+        Returns:
+            tuple: A dataset (CustomImageDataset) instance and a StratifiedKFold object.
         """
-        
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        print('Device: ', device)
         
         transform = transforms.Compose([
             transforms.Resize((
@@ -92,6 +64,134 @@ class ModelTrainer:
             shuffle=True,
             random_state=42
         )
+        
+        return dataset, skf
+    
+    def validation(
+            self,
+            device,
+            fold,
+            model,
+            criterion,
+            val_loader,
+            val_losses,
+            val_accuracies,
+            epoch,
+            best_val_loss
+        ):
+        """
+        Evaluates the model on the validation set.
+
+        Runs a validation loop to calculate validation loss and accuracy, saves the model 
+        checkpoint if the validation loss improves, and plots the confusion matrix.
+
+        Args:
+            device (str): Device to run the validation on ('cuda' or 'cpu').
+            fold (int): Current fold number in k-fold cross-validation.
+            model (nn.Module): The neural network model.
+            criterion (nn.Module): Loss function for evaluation.
+            val_loader (DataLoader): DataLoader for validation dataset.
+            val_losses (list): List to store validation loss per epoch.
+            val_accuracies (list): List to store validation accuracy per epoch.
+            epoch (int): Current epoch number.
+            best_val_loss (float): Lowest recorded validation loss for the current fold.
+
+        Returns:
+            tuple: Updated validation loss and accuracy lists, average validation loss, 
+            and validation accuracy for the epoch.
+        """
+        
+        model.eval()
+        val_loss = 0.0
+        correct = 0
+        total = 0
+        all_preds = []
+        all_labels = []
+        
+        with torch.no_grad():
+            print('Validation process...')
+            for images, labels in tqdm(val_loader):
+                images, labels = images.to(device), labels.to(device)
+                
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+                val_loss += loss.item()
+                
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+                
+                all_preds.extend(predicted.cpu().numpy())
+                all_labels.extend(labels.cpu().numpy())
+        
+        avg_val_loss = val_loss / len(val_loader)
+        val_accuracy = 100 * correct / total
+        val_losses.append(avg_val_loss)
+        val_accuracies.append(val_accuracy)
+        
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+    
+            model_path = os.path.join(self.config.models, f'efficientnet_fold_{fold + 1}.pth')
+            torch.save(model.state_dict(), model_path)
+            print(f'Saved Best Model for Fold {fold + 1} at Epoch {epoch + 1}')
+            
+            cm = confusion_matrix(all_labels, all_preds)
+            plt.figure(figsize=(10, 8))
+            sns.heatmap(
+                cm,
+                annot=True,
+                fmt='d',
+                cmap='Blues',
+                xticklabels=range(self.config.model_params.num_classes),
+                yticklabels=range(self.config.model_params.num_classes)
+            )
+            plt.xlabel('Predicted Labels')
+            plt.ylabel('True Labels')
+            plt.title(f'Confusion Matrix for Fold {fold + 1}')
+            plt.savefig(os.path.join(self.config.figures, f'cm_fold_{fold + 1}.png'))
+        
+        return val_losses, val_accuracies, avg_val_loss, val_accuracy
+    
+    def train_plot(self, range, train_matric, val_matric, train_label, val_label, fold):
+        """
+        Plots training and validation metrics over epochs for a specific fold.
+
+        Saves the plot for either loss or accuracy.
+
+        Args:
+            range (iterable): Epochs range for the plot x-axis.
+            train_matric (list): Training metric values per epoch.
+            val_matric (list): Validation metric values per epoch.
+            train_label (str): Label for training metric (e.g., 'Train Loss').
+            val_label (str): Label for validation metric (e.g., 'Validation Loss').
+            fold (int): Current fold number in k-fold cross-validation.
+        """
+        
+        plt.figure(figsize=(12, 6))
+        plt.plot(range, train_matric, label=train_label)
+        plt.plot(range, val_matric, label=val_label)
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title(f'Train/validation Loss for Fold {fold + 1}')
+        plt.legend()
+        plt.savefig(os.path.join(self.config.figures, f'Train_Val_{str.split(train_label)[-1]}_Fold_{fold + 1}.png'))
+    
+    def train(self):
+        """
+        Main training function to train the model using k-fold cross-validation.
+
+        For each fold, trains the model across epochs, tracks loss and accuracy, 
+        validates and saves the best model checkpoint, and plots metrics.
+
+        Returns:
+            None
+        """
+        
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print('Device: ', device)
+        
+        dataset, skf = self.dataset_folds_preparation()
         
         for fold, (train_idx, val_idx) in tqdm(enumerate(skf.split(dataset.data_frame, dataset.data_frame['label']))):
             print(f'Fold {fold + 1}/{self.config.model_params.num_folds}')
@@ -161,81 +261,43 @@ class ModelTrainer:
                 train_accuracy = 100 * correct_train / total_train
                 train_accuracies.append(train_accuracy)
                 
-                model.eval()
-                val_loss = 0.0
-                correct = 0
-                total = 0
-                all_preds = []
-                all_labels = []
-                
-                with torch.no_grad():
-                    print('Validation process...')
-                    for images, labels in tqdm(val_loader):
-                        images, labels = images.to(device), labels.to(device)
-                        
-                        outputs = model(images)
-                        loss = criterion(outputs, labels)
-                        val_loss += loss.item()
-                        
-                        _, predicted = torch.max(outputs.data, 1)
-                        total += labels.size(0)
-                        correct += (predicted == labels).sum().item()
-                        
-                        all_preds.extend(predicted.cpu().numpy())
-                        all_labels.extend(labels.cpu().numpy())
-                
-                avg_val_loss = val_loss / len(val_loader)
-                val_accuracy = 100 * correct / total
-                val_losses.append(avg_val_loss)
-                val_accuracies.append(val_accuracy)
+                val_losses, val_accuracies, avg_val_loss, val_accuracy = self.validation(
+                    device,
+                    fold,
+                    model,
+                    criterion,
+                    val_loader,
+                    val_losses,
+                    val_accuracies,
+                    epoch,
+                    best_val_loss
+                )
                 
                 print(f'Epoch [{epoch+1}/{self.config.model_params.num_epochs}], '
-                        f'Loss: {avg_train_loss:.4f}, '
-                        f'Validation Loss: {avg_val_loss:.4f}, '
-                        f'Train Accuracy: {train_accuracy:.2f}%, '
-                        f'Validation Accuracy: {val_accuracy:.2f}%')
-                
-                if avg_val_loss < best_val_loss:
-                    best_val_loss = avg_val_loss
-            
-                    model_path = os.path.join(self.config.models, f'efficientnet_fold_{fold + 1}.pth')
-                    torch.save(model.state_dict(), model_path)
-                    print(f'Saved Best Model for Fold {fold + 1} at Epoch {epoch + 1}')
-                    
-                    cm = confusion_matrix(all_labels, all_preds)
-                    plt.figure(figsize=(10, 8))
-                    sns.heatmap(
-                        cm,
-                        annot=True,
-                        fmt='d',
-                        cmap='Blues',
-                        xticklabels=range(self.config.model_params.num_classes),
-                        yticklabels=range(self.config.model_params.num_classes)
-                    )
-                    plt.xlabel('Predicted Labels')
-                    plt.ylabel('True Labels')
-                    plt.title(f'Confusion Matrix for Fold {fold + 1}')
-                    plt.savefig(os.path.join(self.config.figures, f'cm_fold_{fold + 1}.png'))
+                      f'Loss: {avg_train_loss:.4f}, '
+                      f'Validation Loss: {avg_val_loss:.4f}, '
+                      f'Train Accuracy: {train_accuracy:.2f}%, '
+                      f'Validation Accuracy: {val_accuracy:.2f}%')
             
             epochs_range = range(1, self.config.model_params.num_epochs + 1)
             
-            plt.figure(figsize=(12, 6))
-            plt.plot(epochs_range, train_losses, label='Train Loss')
-            plt.plot(epochs_range, val_losses, label='Validation Loss')
-            plt.xlabel('Epochs')
-            plt.ylabel('Loss')
-            plt.title(f'Train/validation Loss for Fold {fold + 1}')
-            plt.legend()
-            plt.savefig(os.path.join(self.config.figures, f'train_val_lossfold_{fold + 1}.png'))
+            self.train_plot(
+                epochs_range,
+                train_losses,
+                val_losses,
+                'Train Loss',
+                'Validation Loss',
+                fold
+            )
             
-            plt.figure(figsize=(12, 6))
-            plt.plot(epochs_range, train_accuracies, label='Train Accuracy')
-            plt.plot(epochs_range, val_accuracies, label='Validation Accuracy')
-            plt.xlabel('Epochs')
-            plt.ylabel('Accuracy')
-            plt.title(f'Train/Validation Accuracy for Fold {fold + 1}')
-            plt.legend()
-            plt.savefig(os.path.join(self.config.figures, f'train_val_accuracy_fold_{fold + 1}.png'))
+            self.train_plot(
+                epochs_range,
+                train_accuracies,
+                val_accuracies,
+                'Train Accuracy',
+                'Validation Accuracy',
+                fold
+            )
             
             print(f'Finished fold {fold + 1}/{self.config.model_params.num_folds}\n')
         
