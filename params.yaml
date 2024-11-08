@@ -3,6 +3,7 @@ transform:
     median_filter_size: 3
 
 model:
+  data_aug_size: 3
   num_folds: 5
   batch_size: 32
   num_epochs: 10
