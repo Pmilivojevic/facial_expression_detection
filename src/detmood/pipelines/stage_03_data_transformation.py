@@ -3,35 +3,41 @@ from src.detmood.components.data_transformation import DataTransformation
 
 class DataTransformationTrainingPipeline:
     """
-    A class to manage the data transformation process for the training pipeline.
+    A pipeline to orchestrate the data transformation and preparation process.
 
-    This class is responsible for orchestrating the data transformation steps, 
-    which may include operations like noise reduction and histogram equalization, 
-    to prepare the dataset for model training.
+    This class initializes the configuration and transformation settings,
+    performs data preprocessing, and prepares the dataset splits for training.
+
+    Methods:
+        main: Executes the data transformation and returns the prepared dataset and splits.
     """
     
     def __init__(self):
         """
-        Initializes the DataTransformationTrainingPipeline instance.
-
-        Currently, no parameters are required, but this method can be 
-        extended in the future to include configuration or other dependencies.
+        Initializes the DataTransformationTrainingPipeline class.
+        
+        Sets up any necessary attributes or configurations required for the data transformation
+        pipeline.
         """
         
         pass
     
     def main(self):
         """
-        The main entry point for the data transformation pipeline.
+        Main method to execute the data transformation pipeline.
 
-        This method performs the following steps:
-        1. Loads configuration settings using the ConfigurationManager.
-        2. Initializes the DataTransformation class with the loaded configuration.
-        3. Executes the transformation process, which includes various data 
-           preprocessing techniques to prepare the dataset for training.
+        This method retrieves configuration settings, initializes the DataTransformation class,
+        applies the transformation process, and returns the transformed dataset and fold splits
+        for model training.
+
+        Returns:
+            Tuple[CustomImageDataset, Iterator]: The dataset after transformations and the splits
+            for cross-validation.
         """
         
         config = ConfigurationManager()
         data_transformation_config = config.get_data_transformation_config()
         data_transformation = DataTransformation(config=data_transformation_config)
-        data_transformation.transformation_compose()
+        dataset, splits = data_transformation.transformation_compose()
+        
+        return dataset, splits

@@ -35,8 +35,8 @@ STAGE_NAME = "Data Transformation"
 
 try:
     logger.info(f">>>>>>>>>>>>>>>>> stage {STAGE_NAME} started <<<<<<<<<<<<<<<<<")
-    obj = DataTransformationTrainingPipeline()
-    obj.main()
+    obdata_transformationj = DataTransformationTrainingPipeline()
+    dataset, splits = obdata_transformationj.main()
     logger.info(f">>>>>>>>>>>>>>>>> stage {STAGE_NAME} completed <<<<<<<<<<<<<<<<<")
 
 except Exception as e:
@@ -49,7 +49,7 @@ STAGE_NAME = "Model Trainer"
 try:
     logger.info(f">>>>>>>>>>>>>>>>> stage {STAGE_NAME} started <<<<<<<<<<<<<<<<<")
     model_trainer = ModelTrainerTrainingPipeline()
-    model_trainer.main()
+    model_trainer.main(dataset=dataset, splits=splits)
     logger.info(f">>>>>>>>>>>>>>>>> stage {STAGE_NAME} completed <<<<<<<<<<<<<<<<<")
     
 except Exception as e:

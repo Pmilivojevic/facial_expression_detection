@@ -107,20 +107,24 @@ class ConfigurationManager:
     
     def get_data_transformation_config(self) -> DataTransformationConfig:
         """
-        Retrieves and prepares the data transformation configuration settings.
+        Generates and returns a DataTransformationConfig object for data transformation.
 
-        The method reads the data transformation configuration from the loaded 
-        configuration file, including noise reduction parameters, creates 
-        necessary directories, and returns a DataTransformationConfig object.
+        This method reads the dataset validation status from a file, ensures that the
+        transformed dataset directory is created, and initializes a DataTransformationConfig
+        instance with the relevant paths and parameters for data transformation.
 
         Returns:
-        -------
-        DataTransformationConfig
-            An object containing data transformation configuration settings.
+            DataTransformationConfig: A configuration object containing paths and parameters
+                                      necessary for data transformation and validation setup.
         """
         
         config = self.config.data_transformation
-        params = self.params.transform.noise_reduction
+        dataset_val_status_file = self.config.data_validation.STATUS_FILE
+        
+        with open(dataset_val_status_file, 'r') as f:
+            status = f.read()
+        
+        status = bool(str.split(status)[-1])
         
         create_directories([config.transformed_dataset])
         
@@ -130,7 +134,8 @@ class ConfigurationManager:
             transformed_dataset=config.transformed_dataset,
             dataset_labels_src=config.dataset_labels_src,
             dataset_labels=config.dataset_labels,
-            median_filter_size=params.median_filter_size
+            params=self.params,
+            dataset_val_status=status
         )
         
         return data_transformation_config

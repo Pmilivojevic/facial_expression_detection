@@ -59,26 +59,19 @@ class DataValidationConfig:
 @dataclass(frozen=True)
 class DataTransformationConfig:
     """
-    A configuration class for data transformation settings.
+    Configuration for data transformation and preparation.
 
-    This class holds configuration details required for the data transformation 
-    process, including paths for the original and transformed datasets, as well 
-    as settings for image processing such as the median filter size.
+    This configuration defines paths and parameters needed for dataset transformation, 
+    including source and destination directories, label paths, and transformation parameters.
 
     Attributes:
-    ----------
-    root_dir : Path
-        The root directory for the project.
-    dataset_folder : Path
-        The path to the folder containing the original dataset.
-    transformed_dataset : Path
-        The path where the transformed dataset will be saved.
-    dataset_labels_src : Path
-        The path to the source CSV file containing the original dataset labels.
-    dataset_labels : Path
-        The path to the CSV file where the transformed dataset labels will be saved.
-    median_filter_size : int
-        The size of the median filter to be applied for noise reduction.
+        root_dir (Path): Root directory containing the data.
+        dataset_folder (Path): Directory where the original dataset is stored.
+        transformed_dataset (Path): Directory where transformed dataset will be saved.
+        dataset_labels_src (Path): Path to the source labels for the dataset.
+        dataset_labels (Path): Path to the transformed labels file.
+        params (dict): Parameters for data transformations and processing.
+        dataset_val_status (bool): Flag indicating if data is valid.
     """
     
     root_dir: Path
@@ -86,7 +79,8 @@ class DataTransformationConfig:
     transformed_dataset: Path
     dataset_labels_src: Path
     dataset_labels: Path
-    median_filter_size: int
+    params: dict
+    dataset_val_status: bool
 
 
 @dataclass(frozen=True)

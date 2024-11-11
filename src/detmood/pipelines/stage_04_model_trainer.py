@@ -20,7 +20,7 @@ class ModelTrainerTrainingPipeline:
         
         pass
     
-    def main(self):
+    def main(self, dataset, splits):
         """
         The main entry point for the model training pipeline.
 
@@ -33,5 +33,5 @@ class ModelTrainerTrainingPipeline:
         
         config = ConfigurationManager()
         model_trainer_config = config.get_model_trainer_config()
-        model_trainer = ModelTrainer(config=model_trainer_config)
+        model_trainer = ModelTrainer(config=model_trainer_config, dataset=dataset, splits=splits)
         model_trainer.train()
