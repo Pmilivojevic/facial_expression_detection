@@ -4,14 +4,14 @@ from src.detmood.entity.config_entity import DataValidationConfig
 
 class DataValidation:
     """
-    A class for performing data validation on a dataset to ensure it meets 
-    specific schema and consistency requirements.
+    A class for performing data validation on a dataset to ensure it meets specific schema and
+    consistency requirements.
 
     Attributes:
     ----------
     config : DataValidationConfig
-        Configuration object containing settings for data validation, such as 
-        schema, dataset folder path, and status file path.
+        Configuration object containing settings for data validation, such as schema, dataset 
+        folder path, and status file path.
     """
     
     def __init__(self, config: DataValidationConfig):
@@ -21,8 +21,8 @@ class DataValidation:
         Parameters:
         ----------
         config : DataTransformationConfig
-            The configuration object containing transformation parameters, such as 
-            filter size, dataset folder path, and labels file paths.
+            The configuration object containing transformation parameters, such as filter size,
+            dataset folder path, and labels file paths.
         """
         
         self.config = config
@@ -31,8 +31,8 @@ class DataValidation:
         """
         Applies histogram equalization to an image to enhance its contrast.
 
-        The method converts the image from BGR to HSV, equalizes the histogram 
-        of the V channel, and then converts it back to BGR.
+        The method converts the image from BGR to HSV, equalizes the histogram of the V channel,
+        and then converts it back to BGR.
 
         Parameters:
         ----------

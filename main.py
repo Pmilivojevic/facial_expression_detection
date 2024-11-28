@@ -35,8 +35,8 @@ STAGE_NAME = "Data Transformation"
 
 try:
     logger.info(f">>>>>>>>>>>>>>>>> stage {STAGE_NAME} started <<<<<<<<<<<<<<<<<")
-    obdata_transformationj = DataTransformationTrainingPipeline()
-    dataset, splits = obdata_transformationj.main()
+    data_transformation = DataTransformationTrainingPipeline()
+    dataset, splits = data_transformation.main()
     logger.info(f">>>>>>>>>>>>>>>>> stage {STAGE_NAME} completed <<<<<<<<<<<<<<<<<")
 
 except Exception as e:

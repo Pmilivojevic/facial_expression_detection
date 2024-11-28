@@ -2,25 +2,37 @@ artifacts_root: artifacts
 
 data_ingestion:
   root_dir: artifacts/data_ingestion
-  source_URL: https://drive.usercontent.google.com/download?id=184K8sLVcL_fq76pA2o8Bg4BthNLcwUel&export=download&authuser=0&confirm=t
-  local_data_file: artifacts/data_ingestion/labels_and_dataset.zip
+  # source_URL: https://drive.usercontent.google.com/download?id=184K8sLVcL_fq76pA2o8Bg4BthNLcwUel&export=download&authuser=0&confirm=t
+  source_URL: shuvoalok/raf-db-dataset
+  # local_data_file: artifacts/data_ingestion/labels_and_dataset.zip
+  local_data_file: artifacts/data_ingestion/raf-db-dataset.zip
 
 data_validation:
   root_dir: artifacts/data_validation
-  dataset_folder: artifacts/data_ingestion/dataset
-  dataset_labels: artifacts/data_ingestion/labels.csv
+  # dataset_folder: artifacts/data_ingestion/dataset
+  # dataset_labels: artifacts/data_ingestion/labels.csv
+  dataset_folder: artifacts/data_ingestion/DATASET
+  dataset_labels: artifacts/data_ingestion/train_labels.csv
   STATUS_FILE: artifacts/data_validation/status.txt
 
 data_transformation:
   root_dir: artifacts/data_transformation
-  dataset_folder: artifacts/data_ingestion/dataset
-  transformed_dataset: artifacts/data_transformation/dataset
-  dataset_labels_src: artifacts/data_ingestion/labels.csv
-  dataset_labels: artifacts/data_transformation/labels.csv
+  # dataset_folder: artifacts/data_ingestion/dataset
+  dataset_folder: artifacts/data_ingestion/DATASET
+  # transformed_dataset: artifacts/data_transformation/dataset
+  transformed_dataset: artifacts/data_transformation/DATASET
+  # dataset_labels_src: artifacts/data_ingestion/labels.csv
+  # dataset_labels: artifacts/data_transformation/labels.csv
+  dataset_labels_src: artifacts/data_ingestion/train_labels.csv
+  dataset_labels: artifacts/data_transformation/train_labels.csv
 
 model_trainer:
   root_dir: artifacts/model_trainer
-  models: artifacts/model_trainer/models
-  figures: artifacts/model_trainer/figures
-  dataset_folder: artifacts/data_transformation/dataset
-  dataset_labels: artifacts/data_transformation/labels.csv
+  # models: artifacts/model_trainer/models
+  models: artifacts/model_trainer/benchmark/models
+  # figures: artifacts/model_trainer/figures
+  figures: artifacts/model_trainer/benchmark/figures
+  # dataset_folder: artifacts/data_transformation/dataset
+  # dataset_labels: artifacts/data_transformation/labels.csv
+  dataset_folder: artifacts/data_transformation/DATASET/train
+  dataset_labels: artifacts/data_transformation/train_labels.csv
