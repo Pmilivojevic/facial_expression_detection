@@ -3,7 +3,8 @@ from src.detmood.entity.config_entity import (
     DataIngestionConfig,
     DataValidationConfig,
     DataTransformationConfig,
-    ModelTrainerConfig
+    ModelTrainerConfig,
+    ModelEvaluationConfig
 )
 from src.detmood.utils.main_utils import create_directories, read_yaml
 
@@ -134,6 +135,8 @@ class ConfigurationManager:
             transformed_dataset=config.transformed_dataset,
             dataset_labels_src=config.dataset_labels_src,
             dataset_labels=config.dataset_labels,
+            test_labels_src=config.test_labels_src,
+            test_labels=config.test_labels,
             params=self.params,
             dataset_val_status=status
         )
@@ -170,3 +173,28 @@ class ConfigurationManager:
         )
         
         return model_trainer_config
+    
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        """
+        Constructs and returns a ModelEvaluationConfig object with the necessary
+        configuration details for the model evaluation process.
+
+        Returns:
+            ModelEvaluationConfig: A dataclass containing all evaluation configurations.
+        """
+    
+        config = self.config.model_evaluation
+        params = self.params.model
+        
+        create_directories([config.stats])
+        
+        model_evaluation_config = ModelEvaluationConfig(
+            root_dir=config.root_dir,
+            test_data_path=config.test_data_path,
+            test_labels=config.test_labels,
+            models_path=config.models_path,
+            stats=config.stats,
+            model_params=params
+        )
+        
+        return model_evaluation_config

@@ -2,7 +2,7 @@ import os
 import cv2
 from tqdm import tqdm
 import pandas as pd
-from src.detmood.constant import MOOD_DICT
+from src.detmood.constant import MOOD_DICT, MOOD_DICT_BENCHMARK
 from src.detmood.entity.config_entity import DataTransformationConfig
 from torchvision import transforms
 from src.detmood.constant.dataset_preparation import CustomImageDataset
@@ -68,6 +68,22 @@ class DataTransformation:
         
         return img_filt
     
+    def labels_csv_transform(self, csv_path, save_path, dict):
+        """
+        Transforms label values in the CSV to mapped values based on a predefined dictionary
+        (MOOD_DICT).
+
+        Reads the CSV file containing labels, updates the labels to standardized mood names,
+        and saves the modified file to a new path.
+        """
+        
+        labels_df = pd.read_csv(csv_path)
+        
+        for ind in labels_df.index:
+            labels_df.loc[ind, 'label'] = dict[labels_df.loc[ind, 'label']]
+        
+        labels_df.to_csv(save_path, index=False)
+    
     def ungroup_folder_classes(self):
         """
         Restructures the dataset by ungrouping images from hierarchical class directories
@@ -104,45 +120,12 @@ class DataTransformation:
                                 img
                             ), img_filt)
                         else:
-                        
                             shutil.copy2(
                                 os.path.join(self.config.dataset_folder, dir, class_dir, img),
                                 os.path.join(self.config.transformed_dataset, dir)
                             )
             
             # shutil.copy2(self.config.dataset_labels_src, self.config.dataset_labels)
-    
-    # def labels_csv_transform(self):
-    #     """
-    #     Transforms label values in the CSV to mapped values based on a predefined dictionary
-    #     (MOOD_DICT).
-
-    #     Reads the CSV file containing labels, updates the labels to standardized mood names,
-    #     and saves the modified file to a new path.
-    #     """
-        
-    #     labels_df = pd.read_csv(self.config.dataset_labels_src)
-        
-    #     for ind in labels_df.index:
-    #         labels_df.loc[ind, 'label'] = MOOD_DICT[labels_df.loc[ind, 'label']]
-        
-    #     labels_df.to_csv(self.config.dataset_labels, index=False)
-    
-    def labels_csv_transform(self):
-        """
-        Transforms label values in the CSV to mapped values based on a predefined dictionary
-        (MOOD_DICT).
-
-        Reads the CSV file containing labels, updates the labels to standardized mood names,
-        and saves the modified file to a new path.
-        """
-        
-        labels_df = pd.read_csv(self.config.dataset_labels_src)
-        
-        for ind in labels_df.index:
-            labels_df.loc[ind, 'label'] = int(labels_df.loc[ind, 'label']) - 1
-        
-        labels_df.to_csv(self.config.dataset_labels, index=False)
     
     def dataset_folds_preparation(self):
         """
@@ -174,6 +157,7 @@ class DataTransformation:
             # self.config.transformed_dataset,
             os.path.join(self.config.transformed_dataset, 'train'),
             self.config.params.model.data_aug_size,
+            'train',
             transform=transform
         )
         
@@ -221,7 +205,8 @@ class DataTransformation:
         
         if self.config.dataset_val_status:
             self.ungroup_folder_classes()
-            self.labels_csv_transform()
+            self.labels_csv_transform(self.config.dataset_labels_src, self.config.dataset_labels, MOOD_DICT_BENCHMARK)
+            self.labels_csv_transform(self.config.test_labels_src, self.config.test_labels, MOOD_DICT_BENCHMARK)
             dataset, splits = self.dataset_folds_preparation()
             
             return dataset, splits

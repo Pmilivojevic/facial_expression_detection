@@ -20,7 +20,7 @@ class CustomImageDataset(Dataset):
         balanced_frame (DataFrame): DataFrame containing balanced image paths and labels.
     """
     
-    def __init__(self, csv_file, root_dir, aug_size, transform=None):
+    def __init__(self, csv_file, root_dir, aug_size, phase, transform=None):
         """
         Initializes CustomImageDataset with data file, directory, augmentation size, and transform.
 
@@ -35,6 +35,7 @@ class CustomImageDataset(Dataset):
         self.root_dir = root_dir
         self.aug_size = aug_size
         self.transform = transform
+        self.phase = phase
         self.balanced_frame = self.balance_data()
     
     def balance_data(self):
@@ -85,8 +86,10 @@ class CustomImageDataset(Dataset):
         Returns:
             int: The length of `balanced_frame`, representing the number of images in the dataset.
         """
-        
-        return len(self.balanced_frame)
+        if self.phase == 'train':
+            return len(self.balanced_frame)
+        elif self.phase == 'test':
+            return len(self.data_frame)
 
     def __getitem__(self, idx):
         """
@@ -101,13 +104,16 @@ class CustomImageDataset(Dataset):
             is the class label.
         """
         
-        label = self.balanced_frame.iloc[idx, 1]
-        img_path = os.path.join(self.root_dir, self.balanced_frame.iloc[idx, 0])
-        img = Image.open(img_path).convert('RGB')
+        if self.phase == 'train':
+            label = self.balanced_frame.iloc[idx, 1]
+            img_path = os.path.join(self.root_dir, self.balanced_frame.iloc[idx, 0])
+            img = Image.open(img_path).convert('RGB')
+        elif self.phase == 'test':
+            label = self.data_frame.iloc[idx, 1]
+            img_path = os.path.join(self.root_dir, self.data_frame.iloc[idx, 0])
+            img = Image.open(img_path).convert('RGB')
         
-        if self.transform and idx >= len(self.data_frame):
-            img = self.transform(img)
-        elif self.transform:
+        if self.transform:
             img = self.transform(img)
         
         return img, label

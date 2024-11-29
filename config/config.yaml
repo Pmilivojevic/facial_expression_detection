@@ -25,6 +25,8 @@ data_transformation:
   # dataset_labels: artifacts/data_transformation/labels.csv
   dataset_labels_src: artifacts/data_ingestion/train_labels.csv
   dataset_labels: artifacts/data_transformation/train_labels.csv
+  test_labels_src: artifacts/data_ingestion/test_labels.csv
+  test_labels: artifacts/data_transformation/test_labels.csv
 
 model_trainer:
   root_dir: artifacts/model_trainer
@@ -36,3 +38,10 @@ model_trainer:
   # dataset_labels: artifacts/data_transformation/labels.csv
   dataset_folder: artifacts/data_transformation/DATASET/train
   dataset_labels: artifacts/data_transformation/train_labels.csv
+
+model_evaluation:
+  root_dir: artifacts/model_evaluation
+  test_data_path: artifacts/data_transformation/DATASET/test
+  test_labels: artifacts/data_transformation/test_labels.csv
+  models_path: artifacts/model_trainer/models
+  stats: artifacts/model_evaluation/stats

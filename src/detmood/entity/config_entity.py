@@ -79,6 +79,8 @@ class DataTransformationConfig:
     transformed_dataset: Path
     dataset_labels_src: Path
     dataset_labels: Path
+    test_labels_src: Path
+    test_labels: Path
     params: dict
     dataset_val_status: bool
 
@@ -115,4 +117,28 @@ class ModelTrainerConfig:
     figures: Path
     dataset_folder: Path
     dataset_labels: Path
+    model_params: dict
+
+
+@dataclass(frozen=True)
+class ModelEvaluationConfig:
+    """
+    Configuration for model evaluation. Contains paths and parameters related
+    to test data, models, and evaluation metrics.
+    
+    Attributes:
+        root_dir (Path): The root directory for evaluation-related artifacts.
+        test_data_path (Path): Path to the test data directory.
+        test_labels (Path): Path to the test labels file.
+        models_path (Path): Path to the directory containing trained models.
+        stats (Path): Path to save evaluation statistics.
+        model_params (dict): Dictionary containing model parameters like the number 
+                             of classes, input size, batch size, etc.
+    """
+    
+    root_dir: Path
+    test_data_path: Path
+    test_labels: Path
+    models_path: Path
+    stats: Path
     model_params: dict
