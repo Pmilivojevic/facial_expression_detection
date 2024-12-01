@@ -1,50 +1,67 @@
-# facial_expression_detection
+# Facial Expression Detection
 
-This is a project for detecting people's emotions based on their facial expression.
+A project that uses deep learning to classify emotions based on facial expressions, leveraging the **EfficientNet** model from PyTorch. It identifies seven emotions: **happiness**, **sadness**, **fear**, **surprise**, **anger**, **disgust**, and **neutral expression**.
 
-This project uses the EfficientNet model of the PyTorch library for this purpose. EfficientNet model uses dataset https://drive.google.com/file/d/184K8sLVcL_fq76pA2o8Bg4BthNLcwUel/view for model training so it can distinguish 7 different emotion (happiness, sadness, fear, surprise, anger, disgust and the neutral expression).
+---
 
-In order to use this project, you need to follow the next steps!
+## Features
 
-# How to run?
-### STEPS:
+- Emotion classification into seven categories.
+- Data pipelines for ingestion, validation, transformation, and training.
+- Visualization of training progress and results.
+- Easy-to-modify hyperparameter configuration in `params.yaml`.
 
-Clone the repository
+---
 
+## Requirements
+
+- Python 3.x
+- Libraries listed in `requirements.txt`
+
+---
+
+## Setup
+
+### Clone the Repository
 ```bash
-Project repo: https://github.com/Pmilivojevic/facial_expression_detection.git
+git clone https://github.com/Pmilivojevic/facial_expression_detection.git
+cd facial_expression_detection
 ```
 
-### STEP 01- Create a virtual environment after opening the repository
-
+### Create a Virtual Environment
 ```bash
 virtualenv env
+source env/bin/activate
 ```
 
-### STEP 02- install the requirements
+---
+
+### Install Dependencies
 ```bash
-pip Install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-### STEP 03- Run file "main.py"
+## Running the Project
+1. Execute the main script:
+
 ```bash
 python main.py
 ```
 
-Running process will create folder structure:
+2. Upon running, the project generates a structured output in the artifact folder, containing results from the pipelines.
 
-    - artifact
+---
 
-        - data_ingestion
+## Outputs
+- Statistics: Training/validation loss plots and confusion matrices in the *`evaluation_results`* folder.
+- Pipelines:
+    - Data Ingestion
+    - Data Validation
+    - Data Transformation
+    - Model Training
+    - Model Evaluation
 
-        - data_validation
+---
 
-        - data_transformation
-
-        - model_trainer
-
-        - model_validation
-
-Project execution consists of five stages, five pipelines for downloading the data, validating the data, transforming the data, training the model, and validating the model. Results of every pipeline execution are put in a corresponding folder. The model validation part is missing. Because of the  limited time, I didn't get to implement that phase.
-
-In folder "figures" are images of train/validation plots for losses and accuracy, as well as the confusion matrixes for every fold of training with hyperparameters that you can find in "params.yaml" file.
+## License
+This project is licensed under the MIT License. See the **`LICENSE`** file for details.
